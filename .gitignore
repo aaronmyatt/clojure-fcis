@@ -1,0 +1,34 @@
+# Clojure
+target/
+.cpcache/
+*/.cpcache/
+*/*/.cpcache/
+*.jar
+*.class
+
+# nREPL
+.nrepl-port
+.nrepl-history
+
+# Editor
+.idea/
+*.iml
+.vscode/
+.calva/
+*.swp
+*.swo
+*~
+
+# Clojure tooling
+.lsp/
+.clj-kondo/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test output
+/tmp/

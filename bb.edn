@@ -1,0 +1,44 @@
+{:tasks
+ {;; --- REPL ---
+  nrepl
+  {:doc  "Start nREPL with all modules loaded"
+   :task (shell "clojure -M:dev:nrepl")}
+
+  ;; --- Tests ---
+  test:all
+  {:doc  "Run all tests across all modules"
+   :task (shell "clojure -X:test")}
+
+  test:core
+  {:doc  "Run Core module tests only"
+   :task (shell "clojure -X:test/core")}
+
+  test:adapter
+  {:doc  "Run Adapter module tests only"
+   :task (shell "clojure -X:test/adapter")}
+
+  test:app
+  {:doc  "Run App module tests only"
+   :task (shell "clojure -X:test/app")}
+
+  ;; --- CLI per layer ---
+  core:cli
+  {:doc  "CLI for Core layer functions. Usage: bb core:cli list|describe|run [args...]"
+   :task (apply shell "clojure -M:cli/core" "--namespaces" "fcis.core.user" "--" *command-line-args*)}
+
+  adapter:cli
+  {:doc  "CLI for Adapter layer functions. Usage: bb adapter:cli list|describe|run [args...]"
+   :task (apply shell "clojure -M:cli/adapter" "--namespaces" "fcis.adapter.user-store" "--" *command-line-args*)}
+
+  app:cli
+  {:doc  "CLI for App layer functions. Usage: bb app:cli list|describe|run [args...]"
+   :task (apply shell "clojure -M:cli/app" "--namespaces" "fcis.app.main" "--" *command-line-args*)}
+
+  ;; --- Utility ---
+  clean
+  {:doc  "Remove build artifacts"
+   :task (shell "rm -rf target .cpcache modules/core/.cpcache modules/adapter/.cpcache modules/app/.cpcache")}
+
+  deps
+  {:doc  "Download all dependencies"
+   :task (shell "clojure -P -M:dev:nrepl:test")}}}
