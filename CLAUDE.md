@@ -96,6 +96,18 @@ bb app:cli list                                     # List App functions
 | CLI runner (JVM-only) | `shared/src/fcis/cli/runner.clj` | `.clj` |
 | Tests | `modules/<module>/test/fcis/<module>/` | `.cljc` or `.clj`/`.cljs` |
 
+## Starting a New Project from This Template
+
+After cloning or creating a repo from this template, rename the `fcis` namespace prefix to your project name:
+
+```bash
+bb rename myproject   # Renames all namespaces, directories, and config references
+bb test:all           # Verify JVM tests pass
+bb test:cljs          # Verify CLJS tests pass
+```
+
+This replaces `fcis` everywhere — namespace declarations, directory paths, `deps.edn`, `shadow-cljs.edn`, `package.json`, and this file. The script validates that the name is a valid Clojure namespace segment (lowercase, hyphens allowed). Run it once immediately after cloning.
+
 ## Common Tasks
 
 ```bash
@@ -109,4 +121,5 @@ bb cljs:watch     # Start shadow-cljs dev server (http://localhost:8000)
 bb cljs:release   # Build optimized JS bundle
 bb clean          # Remove build artifacts
 bb deps           # Download all dependencies (JVM + npm)
+bb rename <name>  # Rename namespace prefix for new project
 ```

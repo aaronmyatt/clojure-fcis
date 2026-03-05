@@ -55,4 +55,9 @@
   deps
   {:doc  "Download all dependencies (JVM + npm)"
    :task (do (shell "clojure -P -M:dev:nrepl:test:cljs")
-             (shell "npm install"))}}}
+             (shell "npm install"))}
+
+  ;; --- Template ---
+  rename
+  {:doc  "Rename the namespace prefix for a new project. Usage: bb rename <new-name>"
+   :task (apply shell "bb" "--file" "scripts/rename.bb" *command-line-args*)}}}
