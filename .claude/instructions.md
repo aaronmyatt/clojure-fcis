@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a Clojure FCIS (Functional Core, Imperative Shell) monorepo. Read `CLAUDE.md` in the project root for architecture and conventions.
+This is a Clojure FCIS (Functional Core, Imperative Shell) monorepo. Read `CLAUDE.md` in the project root for architecture, conventions, and agent workflow rules (TDD, comments, documentation policy).
 
 ## When Modifying Code
 

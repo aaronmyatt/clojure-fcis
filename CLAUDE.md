@@ -1,17 +1,17 @@
 # FCIS Project Conventions
 
-This is a Clojure project following the **Functional Core, Imperative Shell** (FCIS) pattern. It is structured as a monorepo with three layers, designed for productive human-LLM collaboration.
+This is a Clojure project following the **Functional Core, Imperative Shell** (FCIS) pattern. It is structured as a monorepo with three layers, designed for productive human-LLM collaboration. Core logic is cross-platform (`.cljc`) — it compiles for both JVM Clojure and ClojureScript.
 
 ## Architecture
 
 ```
-Core (pure)  →  Adapter (side effects)  →  App (wiring)
+Core (pure, .cljc)  →  Adapter (side effects, .clj/.cljs)  →  App (wiring, .cljc)
 ```
 
-- **Core** (`modules/core/`): Pure functions only. No IO, no atoms, no side effects. Business logic, validation, data transformation.
-- **Adapter** (`modules/adapter/`): Side-effectful code. File I/O, HTTP, databases. Depends on Core. Takes dependencies as function arguments.
-- **App** (`modules/app/`): Orchestration layer. Wires Core + Adapter together. Entry points for HTTP servers, CLIs, frontends.
-- **Shared** (`shared/`): Cross-cutting utilities. CLI runner and common schemas.
+- **Core** (`modules/core/`): Pure functions only. No IO, no atoms, no side effects. `.cljc` files — runs on JVM and JS.
+- **Adapter** (`modules/adapter/`): Side-effectful code. Platform-specific: `.clj` for JVM (file I/O), `.cljs` for browser (in-memory). Same API on both platforms.
+- **App** (`modules/app/`): Orchestration layer. `.cljc` for shared wiring, `.cljs` for browser entry point.
+- **Shared** (`shared/`): Cross-cutting utilities. CLI runner (`.clj`, JVM-only) and common schemas (`.cljc`).
 
 ## Key Rules
 
@@ -22,6 +22,30 @@ Core (pure)  →  Adapter (side effects)  →  App (wiring)
 5. **Prefer maps** over positional arguments for functions with 3+ parameters
 6. **Every source file** ends with a `(comment ...)` block containing 2-3 REPL-evaluable examples
 7. **Validations** return result maps `{:valid? bool :reason str}` — not exceptions
+8. **Core and shared schemas use `.cljc`** — avoid JVM interop; use `#?` reader conditionals when platform-specific code is unavoidable
+
+## Agent Workflow
+
+1. **No unsolicited documentation** — Do not generate README files, changelogs, doc files, or verbose markdown unless explicitly requested. Prefer concise inline documentation over separate files.
+2. **Educational comments with links** — Code comments should teach, not just label. Include links to relevant official documentation, RFCs, or explanatory resources whenever possible. Example:
+   ```clojure
+   ;; Malli function schemas register the spec for runtime validation and CLI discovery.
+   ;; See: https://github.com/metosin/malli#function-schemas
+   (m/=> validate-email [:=> [:cat :string] ValidationResult])
+   ```
+3. **TDD: Red/Green workflow** — When adding or modifying functionality:
+   - Write a failing test first (red)
+   - Make the minimal change to pass the test (green)
+   - Refactor only if needed
+   - Run tests after each step (`bb test:core`, `bb test:cljs`, etc.)
+4. **Proactive suggestions** — When you notice opportunities to improve code quality, architecture, developer experience, or project conventions, suggest them. Flag technical debt, missing tests, inconsistent patterns, or potential simplifications. Suggestions should be clearly marked as optional and not acted on without approval.
+
+## Cross-Platform Rules
+
+- **Core files must be `.cljc`** — no `java.*` imports without a `#?` reader conditional
+- **Adapter has paired implementations**: `user_store.clj` (JVM) and `user_store.cljs` (CLJS) with the same public API
+- **Use `#?(:clj ... :cljs ...)` sparingly** — only for platform-specific operations like timestamps or I/O
+- **Malli schemas work on both platforms** — `m/=>` annotations compile for JVM and JS
 
 ## Adding a New Function
 
@@ -30,53 +54,59 @@ Core (pure)  →  Adapter (side effects)  →  App (wiring)
 3. Add a `(comment ...)` example at the end of the file
 4. Write tests in the corresponding `test/` directory
 5. The function automatically appears in the CLI: `bb core:cli list`
+6. If adding to Adapter: create both `.clj` and `.cljs` implementations
 
 ## Testing
 
 - Core: unit tests + property-based tests using `test.check` and Malli generators
-- Adapter: integration tests with temp directory fixtures
+- Adapter: integration tests — JVM (temp directory fixtures), CLJS (atom reset fixtures)
 - App: smoke/end-to-end tests
-- Run all: `bb test:all`
-- Run per-module: `bb test:core`, `bb test:adapter`, `bb test:app`
+- Run JVM tests: `bb test:all`, `bb test:core`, `bb test:adapter`, `bb test:app`
+- Run CLJS tests: `bb test:cljs`
 
 ## CLI Discovery
 
-Each layer has a CLI for discovering and invoking functions:
+Each layer has a CLI for discovering and invoking functions (JVM, reads `.cljc` files):
 
 ```bash
 bb core:cli list                                    # List all Core functions
 bb core:cli describe fcis.core.user/validate-email  # Show schema and docstring
 bb core:cli run fcis.core.user/validate-email '"test@example.com"'  # Invoke with EDN args
-bb adapter:cli list                                 # List Adapter functions
+bb adapter:cli list                                 # List Adapter functions (JVM version)
 bb app:cli list                                     # List App functions
 ```
 
 ## Schemas
 
-- **Shared schemas** (used across modules): `shared/src/fcis/schemas/common.clj`
-- **Domain schemas** (module-specific): `modules/<module>/src/fcis/<module>/schemas.clj`
+- **Shared schemas** (used across modules): `shared/src/fcis/schemas/common.cljc`
+- **Domain schemas** (module-specific): `modules/<module>/src/fcis/<module>/schemas.cljc`
 - Schemas are plain EDN data — vectors and maps. Reference them in function schemas.
 
 ## File Placement
 
-| What | Where |
-|------|-------|
-| Pure business logic | `modules/core/src/fcis/core/` |
-| Domain schemas | `modules/core/src/fcis/core/schemas.clj` |
-| Side-effectful code | `modules/adapter/src/fcis/adapter/` |
-| Application wiring | `modules/app/src/fcis/app/` |
-| Cross-cutting schemas | `shared/src/fcis/schemas/common.clj` |
-| CLI runner (don't modify) | `shared/src/fcis/cli/runner.clj` |
-| Tests | `modules/<module>/test/fcis/<module>/` |
+| What | Where | Extension |
+|------|-------|-----------|
+| Pure business logic | `modules/core/src/fcis/core/` | `.cljc` |
+| Domain schemas | `modules/core/src/fcis/core/schemas.cljc` | `.cljc` |
+| JVM side-effectful code | `modules/adapter/src/fcis/adapter/` | `.clj` |
+| CLJS side-effectful code | `modules/adapter/src/fcis/adapter/` | `.cljs` |
+| Application wiring | `modules/app/src/fcis/app/` | `.cljc` |
+| Browser entry point | `modules/app/src/fcis/app/browser.cljs` | `.cljs` |
+| Cross-cutting schemas | `shared/src/fcis/schemas/common.cljc` | `.cljc` |
+| CLI runner (JVM-only) | `shared/src/fcis/cli/runner.clj` | `.clj` |
+| Tests | `modules/<module>/test/fcis/<module>/` | `.cljc` or `.clj`/`.cljs` |
 
 ## Common Tasks
 
 ```bash
 bb tasks          # Show all available tasks
-bb test:all       # Run all tests
-bb test:core      # Run Core tests only
+bb test:all       # Run all JVM tests
+bb test:core      # Run Core tests only (JVM)
+bb test:cljs      # Run ClojureScript tests (Node.js)
 bb core:cli list  # Discover Core functions
-bb nrepl           # Start nREPL with all modules
+bb nrepl          # Start nREPL with all modules
+bb cljs:watch     # Start shadow-cljs dev server (http://localhost:8000)
+bb cljs:release   # Build optimized JS bundle
 bb clean          # Remove build artifacts
-bb deps           # Download all dependencies
+bb deps           # Download all dependencies (JVM + npm)
 ```
