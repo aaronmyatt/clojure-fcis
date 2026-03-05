@@ -34,11 +34,25 @@
   {:doc  "CLI for App layer functions. Usage: bb app:cli list|describe|run [args...]"
    :task (apply shell "clojure -M:cli/app" "--namespaces" "fcis.app.main" "--" *command-line-args*)}
 
+  ;; --- ClojureScript ---
+  cljs:watch
+  {:doc  "Start shadow-cljs dev server with hot reload (browser at http://localhost:8000)"
+   :task (shell "npx shadow-cljs watch browser")}
+
+  cljs:release
+  {:doc  "Build optimized ClojureScript bundle"
+   :task (shell "npx shadow-cljs release browser")}
+
+  test:cljs
+  {:doc  "Run ClojureScript tests via Node.js"
+   :task (shell "npx shadow-cljs compile test")}
+
   ;; --- Utility ---
   clean
   {:doc  "Remove build artifacts"
-   :task (shell "rm -rf target .cpcache modules/core/.cpcache modules/adapter/.cpcache modules/app/.cpcache")}
+   :task (shell "rm -rf target .cpcache out public/js modules/core/.cpcache modules/adapter/.cpcache modules/app/.cpcache")}
 
   deps
-  {:doc  "Download all dependencies"
-   :task (shell "clojure -P -M:dev:nrepl:test")}}}
+  {:doc  "Download all dependencies (JVM + npm)"
+   :task (do (shell "clojure -P -M:dev:nrepl:test:cljs")
+             (shell "npm install"))}}}

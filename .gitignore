@@ -30,5 +30,11 @@ target/
 .DS_Store
 Thumbs.db
 
+# ClojureScript / shadow-cljs
+node_modules/
+out/
+public/js/
+.shadow-cljs/
+
 # Test output
 /tmp/

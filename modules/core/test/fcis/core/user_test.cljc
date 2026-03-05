@@ -1,5 +1,6 @@
 (ns fcis.core.user-test
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require #?(:clj  [clojure.test :refer [deftest testing is]]
+               :cljs [cljs.test :refer [deftest testing is]])
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]

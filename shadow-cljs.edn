@@ -1,0 +1,21 @@
+;; shadow-cljs configuration
+;; Dependencies and source paths are read from deps.edn via the :cljs alias
+{:deps {:aliases [:cljs]}
+
+ :dev-http {8000 "public"}
+
+ :builds
+ {;; Browser build — serves the demo app
+  :browser
+  {:target    :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules   {:main {:init-fn fcis.app.browser/init}}
+   :devtools  {:after-load fcis.app.browser/init}}
+
+  ;; Node.js test runner — runs all *-test namespaces
+  :test
+  {:target    :node-test
+   :output-to "out/node-tests.js"
+   :ns-regexp "-test$"
+   :autorun   true}}}

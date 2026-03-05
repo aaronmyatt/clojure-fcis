@@ -63,7 +63,8 @@
   {:id         (str (random-uuid))
    :name       name
    :email      (normalize-email email)
-   :created-at (inst-ms (java.util.Date.))})
+   :created-at #?(:clj  (inst-ms (java.util.Date.))
+                  :cljs (.getTime (js/Date.)))})
 
 (m/=> create-user [:=> [:cat :string :string] schemas/User])
 
