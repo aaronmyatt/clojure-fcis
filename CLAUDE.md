@@ -9,7 +9,7 @@ Core (pure, .cljc)  →  Adapter (side effects, .clj/.cljs)  →  App (wiring, .
 ```
 
 - **Core** (`modules/core/`): Pure functions only. No IO, no atoms, no side effects. `.cljc` files — runs on JVM and JS.
-- **Adapter** (`modules/adapter/`): Side-effectful code. Platform-specific: `.clj` for JVM (file I/O), `.cljs` for browser (in-memory). Same API on both platforms.
+- **Adapter** (`modules/adapter/`): Side-effectful code. Persistence is backed by [PocketBase](https://pocketbase.io/) — all calls are proxied through the JVM backend. Platform-specific: `.clj` for JVM, `.cljs` for browser. Same API on both platforms.
 - **App** (`modules/app/`): Orchestration layer. `.cljc` for shared wiring, `.cljs` for browser entry point.
 - **Shared** (`shared/`): Cross-cutting utilities. CLI runner (`.clj`, JVM-only) and common schemas (`.cljc`).
 
@@ -108,6 +108,20 @@ bb test:cljs          # Verify CLJS tests pass
 
 This replaces `fcis` everywhere — namespace declarations, directory paths, `deps.edn`, `shadow-cljs.edn`, `package.json`, and this file. The script validates that the name is a valid Clojure namespace segment (lowercase, hyphens allowed). Run it once immediately after cloning.
 
+## PocketBase
+
+[PocketBase](https://pocketbase.io/) is the default persistence layer. It runs as a single binary alongside the JVM backend — all browser requests are proxied through the server.
+
+```bash
+bb pb:install     # Download the latest PocketBase binary for this platform
+bb pb:start       # Start PocketBase (admin UI: http://127.0.0.1:8090/_/)
+bb pb:stop        # Stop PocketBase
+```
+
+- Binary and data live in `.pocketbase/` (git-ignored)
+- `bb deps` includes PocketBase download automatically
+- The download script (`scripts/pocketbase.bb`) detects OS/arch and fetches the correct release from GitHub
+
 ## Common Tasks
 
 ```bash
@@ -119,7 +133,10 @@ bb core:cli list  # Discover Core functions
 bb nrepl          # Start nREPL with all modules
 bb cljs:watch     # Start shadow-cljs dev server (http://localhost:8000)
 bb cljs:release   # Build optimized JS bundle
+bb pb:install     # Download PocketBase binary
+bb pb:start       # Start PocketBase server
+bb pb:stop        # Stop PocketBase server
 bb clean          # Remove build artifacts
-bb deps           # Download all dependencies (JVM + npm)
+bb deps           # Download all dependencies (JVM + npm + PocketBase)
 bb rename <name>  # Rename namespace prefix for new project
 ```
