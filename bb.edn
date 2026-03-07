@@ -47,15 +47,31 @@
   {:doc  "Run ClojureScript tests via Node.js"
    :task (shell "npx shadow-cljs compile test")}
 
+  ;; --- PocketBase ---
+  pb:install
+  {:doc  "Download the latest PocketBase binary for this platform"
+   :task (shell "bb" "--file" "scripts/pocketbase.bb")}
+
+  pb:start
+  {:doc  "Start PocketBase server (admin: http://127.0.0.1:8090/_/)"
+   :task (shell ".pocketbase/pocketbase" "serve"
+                "--dir=.pocketbase/pb_data"
+                "--http=127.0.0.1:8090")}
+
+  pb:stop
+  {:doc  "Stop PocketBase server"
+   :task (shell "pkill" "-f" ".pocketbase/pocketbase serve")}
+
   ;; --- Utility ---
   clean
   {:doc  "Remove build artifacts"
    :task (shell "rm -rf target .cpcache out public/js modules/core/.cpcache modules/adapter/.cpcache modules/app/.cpcache")}
 
   deps
-  {:doc  "Download all dependencies (JVM + npm)"
+  {:doc  "Download all dependencies (JVM + npm + PocketBase)"
    :task (do (shell "clojure -P -M:dev:nrepl:test:cljs")
-             (shell "npm install"))}
+             (shell "npm install")
+             (shell "bb" "pb:install"))}
 
   ;; --- Template ---
   rename

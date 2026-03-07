@@ -36,5 +36,8 @@ out/
 public/js/
 .shadow-cljs/
 
+# PocketBase (binary + data)
+.pocketbase/
+
 # Test output
 /tmp/

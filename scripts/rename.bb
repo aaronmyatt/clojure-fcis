@@ -34,6 +34,7 @@
   ["**/*.clj"
    "**/*.cljs"
    "**/*.cljc"
+   "**/*.bb"
    "bb.edn"
    "deps.edn"
    "modules/*/deps.edn"
