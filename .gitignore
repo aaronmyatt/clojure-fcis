@@ -36,6 +36,12 @@ out/
 public/js/
 .shadow-cljs/
 
+# Clojure CLI (local install)
+.clojure-tools/
+
+# Babashka (local install)
+.bb/
+
 # PocketBase (binary + data)
 .pocketbase/
 

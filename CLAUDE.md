@@ -122,6 +122,21 @@ bb pb:stop        # Stop PocketBase
 - `bb deps` includes PocketBase download automatically
 - The download script (`scripts/pocketbase.bb`) detects OS/arch and fetches the correct release from GitHub
 
+## Bootstrap (LLM Sandboxes)
+
+If `clojure` or `bb` (babashka) are not available on the system, run:
+
+```bash
+npm install       # postinstall hook auto-installs clojure + bb locally
+export PATH="$PWD/.clojure-tools/bin:$PWD/.bb/bin:$PATH"
+```
+
+Or run the scripts directly:
+- `./scripts/ensure-clojure.sh` — installs Clojure CLI to `.clojure-tools/` (requires Java)
+- `./scripts/ensure-bb.sh` — installs babashka to `.bb/bin/`
+
+Both directories are git-ignored. Java (JDK 8+) is a prerequisite — the Clojure script will error with install instructions if missing.
+
 ## Common Tasks
 
 ```bash
