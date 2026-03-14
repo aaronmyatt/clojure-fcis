@@ -15,7 +15,15 @@
    :extra-deps
    {org.clojure/clojure          {:mvn/version "1.12.0"}
     metosin/malli                {:mvn/version "0.20.0"}
-    org.clojure/test.check       {:mvn/version "1.1.1"}}}
+    org.clojure/test.check       {:mvn/version "1.1.1"}
+    ;; Web server stack (JVM-only, ignored by CLJS)
+    ;; See: https://github.com/ring-clojure/ring
+    ring/ring-core               {:mvn/version "1.13.0"}
+    ring/ring-jetty-adapter      {:mvn/version "1.13.0"}
+    ;; See: https://github.com/metosin/reitit
+    metosin/reitit-ring          {:mvn/version "0.7.2"}
+    ;; See: https://github.com/weavejester/hiccup
+    hiccup/hiccup                {:mvn/version "2.0.0"}}}
 
   ;; nREPL for editor integration
   :nrepl
@@ -34,6 +42,11 @@
    {org.clojure/clojure          {:mvn/version "1.12.0"}
     metosin/malli                {:mvn/version "0.20.0"}
     org.clojure/test.check       {:mvn/version "1.1.1"}
+    ring/ring-core               {:mvn/version "1.13.0"}
+    ring/ring-jetty-adapter      {:mvn/version "1.13.0"}
+    metosin/reitit-ring          {:mvn/version "0.7.2"}
+    hiccup/hiccup                {:mvn/version "2.0.0"}
+    ring/ring-mock               {:mvn/version "0.4.0"}
     io.github.cognitect-labs/test-runner
     {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
    :exec-fn cognitect.test-runner.api/test
@@ -75,6 +88,11 @@
    {org.clojure/clojure          {:mvn/version "1.12.0"}
     metosin/malli                {:mvn/version "0.20.0"}
     org.clojure/test.check       {:mvn/version "1.1.1"}
+    ring/ring-core               {:mvn/version "1.13.0"}
+    ring/ring-jetty-adapter      {:mvn/version "1.13.0"}
+    metosin/reitit-ring          {:mvn/version "0.7.2"}
+    hiccup/hiccup                {:mvn/version "2.0.0"}
+    ring/ring-mock               {:mvn/version "0.4.0"}
     io.github.cognitect-labs/test-runner
     {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
    :exec-fn cognitect.test-runner.api/test
@@ -98,8 +116,12 @@
   :cli/app
   {:extra-paths ["shared/src" "modules/core/src" "modules/adapter/src" "modules/app/src"]
    :extra-deps
-   {org.clojure/clojure {:mvn/version "1.12.0"}
-    metosin/malli       {:mvn/version "0.20.0"}}
+   {org.clojure/clojure     {:mvn/version "1.12.0"}
+    metosin/malli           {:mvn/version "0.20.0"}
+    ring/ring-core          {:mvn/version "1.13.0"}
+    ring/ring-jetty-adapter {:mvn/version "1.13.0"}
+    metosin/reitit-ring     {:mvn/version "0.7.2"}
+    hiccup/hiccup           {:mvn/version "2.0.0"}}
    :main-opts ["-m" "fcis.cli.runner"]}
 
   ;; ClojureScript (used by shadow-cljs via :deps {:aliases [:cljs]})

@@ -1,10 +1,13 @@
 (ns fcis.app.browser
-  "Browser entry point demonstrating the full FCIS stack.
-   Open the browser console to see the output.
+  "DEPRECATED: Replaced by per-page island modules in fcis.app.islands.*.
+   The MPA architecture uses module splitting — each page loads its own
+   CLJS module. See shadow-cljs.edn :browser :modules.
 
-   This shows the key insight: the SAME pure Core logic runs unchanged
-   in the browser. Only the Adapter (storage backend) differs —
-   file-based on JVM, atom-based here."
+   This file is kept for reference. It is no longer loaded by shadow-cljs.
+
+   ---
+   Original: Browser entry point demonstrating the full FCIS stack.
+   Open the browser console to see the output."
   (:require [fcis.app.main :as app]
             [fcis.core.user :as user]
             [fcis.adapter.user-store :as store]))

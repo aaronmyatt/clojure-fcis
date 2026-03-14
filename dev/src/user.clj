@@ -7,29 +7,45 @@
             [fcis.core.schemas :as core-schemas]
             [fcis.adapter.user-store :as store]
             [fcis.app.main :as app]
+            [fcis.app.server :as server]
             [fcis.schemas.common :as common]
             [malli.core :as m]
             [malli.dev :as dev]))
 
 (defn start!
   "Initialize development environment.
-   Call this after starting the REPL to enable Malli instrumentation."
+   Starts Malli instrumentation and the Ring web server."
   []
   (dev/start!)
-  (println "FCIS dev environment started.")
-  (println "Malli instrumentation enabled — schema violations will throw.")
+  (server/start! {:port 3000})
   (println)
-  (println "Available namespaces:")
-  (println "  user/...         — this namespace (REPL helpers)")
-  (println "  fcis.core.user   — pure user functions")
-  (println "  fcis.adapter.user-store — user persistence")
-  (println "  fcis.app.main    — application wiring")
+  (println "FCIS dev environment started.")
+  (println "  Ring server:  http://localhost:3000")
+  (println "  PocketBase:   http://127.0.0.1:8090/_/  (run bb pb:start)")
+  (println "  shadow-cljs:  run bb cljs:watch in another terminal")
   :ready)
+
+(defn stop!
+  "Stops the Ring server."
+  []
+  (server/stop!)
+  :stopped)
+
+(defn restart!
+  "Restarts the Ring server (useful after route changes)."
+  []
+  (stop!)
+  (server/start! {:port 3000})
+  :restarted)
 
 ;; ---- REPL Examples ----
 (comment
-  ;; Start dev environment
+  ;; Start dev environment (Malli + Ring server)
   (start!)
+
+  ;; Stop/restart server
+  (stop!)
+  (restart!)
 
   ;; Try core functions
   (user/validate-email "alice@example.com")
